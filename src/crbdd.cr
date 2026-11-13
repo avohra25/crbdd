@@ -1,5 +1,4 @@
 require "big"
-require "./crbdd/*"
 
 # Reduced ordered binary decision diagrams.
 #
@@ -13,3 +12,5 @@ module CrBDD
 
   class Error < Exception; end
 end
+
+require "./crbdd/*"

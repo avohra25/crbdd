@@ -30,6 +30,8 @@ Work in progress. Done so far:
 - exact model counting with `BigInt`, satisfying cubes, cube and model
   enumeration
 - Graphviz DOT export
+- boolean expression parser (with `exists`/`forall`) and printer
+- variable reordering by rebuilding into a new order, and sifting
 
 ## Development
 
