@@ -21,8 +21,15 @@ a, b, c = m.var("a"), m.var("b"), m.var("c")
 
 ## Status
 
-Work in progress: the core (unique table, memoised ITE, boolean operators,
-restrict/compose, evaluation, support) is in place.
+Work in progress. Done so far:
+
+- core: unique table, memoised ITE, boolean operators, restrict/compose,
+  evaluation, support
+- existential/universal quantification, relational product
+  (`and_exists`), simultaneous variable renaming
+- exact model counting with `BigInt`, satisfying cubes, cube and model
+  enumeration
+- Graphviz DOT export
 
 ## Development
 

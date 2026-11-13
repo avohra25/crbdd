@@ -131,15 +131,15 @@ module CrBDD
       inspect(io)
     end
 
-    private def wrap(id : Int32) : Bdd
+    protected def wrap(id : Int32) : Bdd
       Bdd.new(@manager, id)
     end
 
-    private def index(v : Int32 | String) : Int32
+    protected def index(v : Int32 | String) : Int32
       v.is_a?(String) ? @manager.var_index(v) : v
     end
 
-    private def same_manager!(other : Bdd) : Nil
+    protected def same_manager!(other : Bdd) : Nil
       unless other.manager.same?(@manager)
         raise Error.new("BDDs belong to different managers")
       end
