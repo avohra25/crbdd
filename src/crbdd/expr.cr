@@ -26,7 +26,9 @@ module CrBDD
 
     abstract def collect_vars(acc : Array(String)) : Nil
     abstract def eval(env : Hash(String, Bool)) : Bool
-    abstract def build(m : Manager) : Bdd
+    # `defs` maps names to previously built functions (macro expansion);
+    # any other identifier is a variable of `m`.
+    abstract def build(m : Manager, defs : Hash(String, Bdd)? = nil) : Bdd
     abstract def to_s(io : IO) : Nil
 
     class Const < Expr
@@ -42,7 +44,7 @@ module CrBDD
         @value
       end
 
-      def build(m : Manager) : Bdd
+      def build(m : Manager, defs : Hash(String, Bdd)? = nil) : Bdd
         m.constant(@value)
       end
 
@@ -65,7 +67,10 @@ module CrBDD
         env.fetch(@name) { raise Error.new("unbound variable #{@name}") }
       end
 
-      def build(m : Manager) : Bdd
+      def build(m : Manager, defs : Hash(String, Bdd)? = nil) : Bdd
+        if defs && (d = defs[@name]?)
+          return d
+        end
         m.var(m.var_index!(@name))
       end
 
@@ -88,8 +93,8 @@ module CrBDD
         !@arg.eval(env)
       end
 
-      def build(m : Manager) : Bdd
-        ~@arg.build(m)
+      def build(m : Manager, defs : Hash(String, Bdd)? = nil) : Bdd
+        ~@arg.build(m, defs)
       end
 
       def to_s(io : IO) : Nil
@@ -130,9 +135,9 @@ module CrBDD
         end
       end
 
-      def build(m : Manager) : Bdd
-        l = @left.build(m)
-        r = @right.build(m)
+      def build(m : Manager, defs : Hash(String, Bdd)? = nil) : Bdd
+        l = @left.build(m, defs)
+        r = @right.build(m, defs)
         case @op
         when "&"   then l & r
         when "|"   then l | r
@@ -185,9 +190,10 @@ module CrBDD
         @kind == "exists" ? results.any? : results.all?
       end
 
-      def build(m : Manager) : Bdd
+      def build(m : Manager, defs : Hash(String, Bdd)? = nil) : Bdd
         @vars.each { |v| m.var_index!(v) }
-        b = @body.build(m)
+        inner = defs.try &.reject(@vars) # bound names shadow definitions
+        b = @body.build(m, inner)
         @kind == "exists" ? b.exists(@vars) : b.forall(@vars)
       end
 
@@ -334,8 +340,8 @@ module CrBDD
   class Manager
     # Parses `src` and builds its BDD, declaring unseen variables at the
     # bottom of the order in order of first appearance.
-    def parse(src : String) : Bdd
-      Expr.parse(src).build(self)
+    def parse(src : String, defs : Hash(String, Bdd)? = nil) : Bdd
+      Expr.parse(src).build(self, defs)
     end
   end
 end

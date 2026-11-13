@@ -3,5 +3,9 @@ version: 0.1.0
 description: Reduced ordered binary decision diagrams (ROBDDs) in pure Crystal
 authors:
   - Aryan Vohra
+targets:
+  crbdd:
+    main: src/cli.cr
+
 crystal: ">= 1.10.0"
 license: MIT
